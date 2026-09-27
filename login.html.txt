@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Terpadu</title>
+  
+  <!-- Memanggil Bootstrap 5 & Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  
+  <style>
+    /* Deklarasi Variabel CSS Global (Akan diubah JS nanti) */
+    :root {
+      --warna-tema: #003366; 
+    }
+
+    body {
+      background-color: #f5f7fa;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      touch-action: pan-y;
+      overflow-x: hidden;
+    }
+    
+    /* --- HALAMAN LOGIN --- */
+    #halamanLogin {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 380px;
+      background: white;
+      padding: 3rem 2rem;
+      border: none;
+    }
+    .btn-tema {
+      background-color: var(--warna-tema); 
+      border-color: var(--warna-tema);
+      color: white;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    .btn-tema:hover, .btn-tema:focus {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    /* --- HALAMAN DASHBOARD PREMIUM --- */
+    #halamanDashboard { display: none; }
+    
+    /* Header Melengkung Khas Aplikasi Native */
+    .header-curve {
+      background-color: var(--warna-tema);
+      padding: 20px 20px 60px 20px;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+      color: white;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .btn-logout {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      border-radius: 50px;
+      padding: 5px 15px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(5px);
+    }
+    
+    /* Area Konten Overlap (Naik menimpa header) */
+    .overlap-content {
+      margin-top: -40px;
+      padding: 0 20px;
+    }
+
+    /* Kartu Identitas Profil */
+    .profile-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    /* Grid Kotak Menu Elegan */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      padding-bottom: 40px;
+    }
+    
+    .menu-card {
+      background: white;
+      border-radius: 22px;
+      text-align: center;
+      padding: 25px 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.03);
+      cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.02);
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      
+      /* State awal untuk animasi masuk */
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    
+    /* Efek Ditekan (Bouncy) */
+    .menu-card:active {
+      transform: scale(0.92) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    /* Desain Ikon 1 Warna (Monokrom Elegan) */
+    .menu-icon-wrap {
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.03); /* Latar memudar */
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px auto;
+    }
+    .menu-icon-wrap i {
+      font-size: 1.8rem;
+      color: var(--warna-tema); /* Warna mengikuti sekolah */
+    }
+    .menu-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #444;
+      margin: 0;
+    }
+
+    /* Animasi Stagger (Menu Muncul Bergantian) */
+    @keyframes slideUpFade {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= HALAMAN LOGIN ================= -->
+  <div id="halamanLogin">
+    <div class="login-card">
+      <div class="text-center mb-4">
+        <h3 id="judulApp" class="fw-bold" style="color: var(--warna-tema);">Portal Login</h3>
+        <p class="text-muted small">Masuk dengan kredensial Anda</p>
+      </div>
+      
+      <form id="loginForm">
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-muted"></i></span>
+            <input type="email" class="form-control form-control-lg bg-light border-0" id="email" required placeholder="Email">
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-lock text-muted"></i></span>
+            <input type="password" class="form-control form-control-lg bg-light border-0" id="password" required placeholder="Kata Sandi">
+          </div>
+        </div>
+        <button type="submit" id="btnSubmit" class="btn btn-tema w-100">Masuk Aplikasi</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= HALAMAN DASHBOARD PREMIUM ================= -->
+  <div id="halamanDashboard">
+    
+    <!-- Header Lengkung -->
+    <div class="header-curve d-flex justify-content-between align-items-center">
+      <div class="fw-bold fs-5" id="namaSekolahNav"><i class="bi bi-buildings me-2"></i>Nama Sekolah</div>
+      <button class="btn-logout" onclick="logout()">Keluar <i class="bi bi-box-arrow-right ms-1"></i></button>
+    </div>
+
+    <!-- Area Konten (Overlap) -->
+    <div class="overlap-content">
+      
+      <!-- Kartu Profil -->
+      <div class="profile-card">
+        <div>
+          <p class="text-muted small mb-1">Selamat datang kembali,</p>
+          <h5 class="fw-bold mb-0" id="namaUserLengkap" style="color: var(--warna-tema);">Nama User</h5>
+        </div>
+        <span class="badge" id="roleUser" style="background-color: var(--warna-tema); padding: 8px 12px; border-radius: 10px;">Role</span>
+      </div>
+
+      <!-- Area Menu Dinamis -->
+      <div class="menu-grid" id="areaMenu">
+        <!-- Javascript akan merakit menu di sini -->
+      </div>
+      
+    </div>
+  </div>
+
+
+  <!-- ================= SCRIPT LOGIKA ================= -->
+  <script>
+    let dataUserGlobal = null; 
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault(); 
+      const emailInput = document.getElementById('email').value;
+      const passInput = document.getElementById('password').value;
+      const btnSubmit = document.getElementById('btnSubmit');
+      
+      btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memeriksa...'; 
+      btnSubmit.disabled = true;
+
+      // === GANTI "URL_API_MAS_BRO" DENGAN LINK DEPLOY LANGKAH 2 ===
+      const API_URL = "URL_API_MAS_BRO";
+
+      // Mengirim data ke Mesin Google tanpa menggunakan google.script.run
+      fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8", 
+        },
+        body: JSON.stringify({ email: emailInput, password: passInput })
+      })
+      .then(response => response.json())
+      .then(respon => {
+        if (respon.status === 'success') {
+          tampilkanDashboard(respon);
+        } else {
+          alert(respon.pesan);
+          btnSubmit.innerHTML = 'Masuk Aplikasi'; 
+          btnSubmit.disabled = false;
+        }
+      })
+      .catch(error => {
+        alert("Gagal menghubungi server: " + error.message);
+        btnSubmit.innerHTML = 'Masuk Aplikasi'; 
+        btnSubmit.disabled = false;
+      });
+
+    function tampilkanDashboard(data) {
+      dataUserGlobal = data;
+      const warnaTema = data.tenant.warnaTema || '#003366';
+      
+      // Mengubah Variabel CSS agar semua warna elemen ikut berubah
+      document.documentElement.style.setProperty('--warna-tema', warnaTema);
+      
+      document.getElementById('halamanLogin').style.display = 'none';
+      document.getElementById('halamanDashboard').style.display = 'block';
+      
+      // Suntik Data Teks
+      document.getElementById('namaSekolahNav').innerHTML = `<i class="bi bi-buildings me-2"></i>` + data.tenant.namaSekolah;
+      document.getElementById('namaUserLengkap').innerText = data.user.nama;
+      document.getElementById('roleUser').innerText = data.user.role;
+
+      // Panggil pembuat menu
+      renderMenu(data.user.role);
+    }
+
+    // --- FUNGSI MERAKIT MENU DENGAN BOOTSTRAP ICONS ELEGANT ---
+    function renderMenu(role) {
+      const areaMenu = document.getElementById('areaMenu');
+      let htmlMenu = '';
+      
+      // Menggunakan ikon garis murni (outline) dari Bootstrap Icons untuk kesan elegan
+      if (role.toLowerCase() === 'guru' || role.toLowerCase() === 'pendidik') {
+        htmlMenu += buatKotakMenu('bi-person-check', 'Presensi Kelas', 'bukaModul("presensi")', 1);
+        htmlMenu += buatKotakMenu('bi-award', 'Input Nilai', 'bukaModul("nilai")', 2);
+        htmlMenu += buatKotakMenu('bi-book', 'E-Jurnal', 'bukaModul("jurnal")', 3);
+        htmlMenu += buatKotakMenu('bi-calendar3-week', 'Jadwal Anda', 'bukaModul("jadwal")', 4);
+      } 
+      else if (role.toLowerCase() === 'admin sekolah' || role.toLowerCase() === 'admin') {
+        htmlMenu += buatKotakMenu('bi-people', 'Data Siswa', 'bukaModul("siswa")', 1);
+        htmlMenu += buatKotakMenu('bi-person-vcard', 'Data Guru', 'bukaModul("guru")', 2);
+        htmlMenu += buatKotakMenu('bi-arrow-left-right', 'Mutasi', 'bukaModul("mutasi")', 3);
+        htmlMenu += buatKotakMenu('bi-envelope-paper', 'Persuratan', 'bukaModul("surat")', 4);
+      }
+      else if (role.toLowerCase() === 'siswa' || role.toLowerCase() === 'orang tua') {
+        htmlMenu += buatKotakMenu('bi-bar-chart-line', 'Rapor Akademik', 'bukaModul("rapor")', 1);
+        htmlMenu += buatKotakMenu('bi-wallet2', 'Tagihan SPP', 'bukaModul("tagihan")', 2);
+        htmlMenu += buatKotakMenu('bi-calendar-check', 'Cek Absensi', 'bukaModul("cek_absen")', 3);
+      }
+      else {
+        // Default Super Admin / Yayasan
+        htmlMenu += buatKotakMenu('bi-pie-chart', 'Statistik', 'bukaModul("statistik")', 1);
+        htmlMenu += buatKotakMenu('bi-gear', 'Pengaturan', 'bukaModul("setting")', 2);
+      }
+
+      areaMenu.innerHTML = htmlMenu;
+    }
+
+    // Fungsi pembuat Kotak HTML dengan Delay Animasi
+    function buatKotakMenu(iconClass, judul, aksi, index) {
+      // Delay bertingkat (0.1s, 0.2s, 0.3s dst) untuk efek muncul berurutan
+      const delay = index * 0.1; 
+      
+      return `
+        <div class="menu-card" onclick="${aksi}" style="animation: slideUpFade 0.5s ease forwards ${delay}s;">
+          <div class="menu-icon-wrap">
+            <i class="bi ${iconClass}"></i>
+          </div>
+          <p class="menu-title">${judul}</p>
+        </div>
+      `;
+    }
+
+    function bukaModul(namaModul) {
+      // Efek getar (haptic feedback) untuk HP jika didukung
+      if (navigator.vibrate) navigator.vibrate(50);
+      alert("Aplikasi akan memuat modul: " + namaModul.toUpperCase());
+    }
+
+    function logout() { window.top.location.reload(); }
+  </script>
+</body>
+</html>
