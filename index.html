@@ -830,7 +830,7 @@
             document.getElementById('judulModul').innerText="Ruang Guru & Kehadiran"; 
             document.getElementById('areaRuangGuru').style.display='block'; 
             
-            // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
+            // LOGIKA PENGECEKAN GURU PIKET & PEMICU KAMERA
             if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
                 document.getElementById('blokBukanPiket').style.display = 'none';
                 document.getElementById('blokPiketAktif').style.display = 'block';
@@ -838,13 +838,13 @@
                     document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
                 }
                 fokusScannerUSB(); 
+                mulaiLiveScanner();
             } else {
                 document.getElementById('blokBukanPiket').style.display = 'block';
                 document.getElementById('blokPiketAktif').style.display = 'none';
             }
-          else if(modulId === 'ruang_guru' || modulId === 'absensi_qr') { 
-            document.getElementById('judulModul').innerText="Ruang Guru & Kehadiran"; 
-            document.getElementById('areaRuangGuru').style.display='block'; 
+        }
+    } // <--- PASTIKAN KURUNG KURAWAL PENUTUP FUNGSI BUKAMODUL INI TETAP ADA
             
             // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
             if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
