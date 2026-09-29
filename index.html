@@ -825,7 +825,10 @@
         else if(modulId === 'verifikasi') { document.getElementById('judulModul').innerText="Verifikasi PPDB"; document.getElementById('areaMejaVerifikasi').style.display='block'; loadMejaVerifikasi(); }
         
        else if(modulId === 'ppdb_ortu') { document.getElementById('judulModul').innerText="PPDB & Mutasi"; document.getElementById('areaPPDBOrtu').style.display='block'; loadDashboardPPDB(); }
-        else if(modulId === 'mutasi_ortu') { document.getElementById('judulModul').innerText="Mutasi Siswa"; document.getElementById('areaMutasiOrtu').style.display='block'; }
+        else if(modulId === 'mutasi_ortu') { 
+            document.getElementById('judulModul').innerText="Mutasi Siswa"; 
+            document.getElementById('areaMutasiOrtu').style.display='block'; 
+        }
         else if(modulId === 'ruang_guru' || modulId === 'absensi_qr') { 
             document.getElementById('judulModul').innerText="Ruang Guru & Kehadiran"; 
             document.getElementById('areaRuangGuru').style.display='block'; 
@@ -844,24 +847,7 @@
                 document.getElementById('blokPiketAktif').style.display = 'none';
             }
         }
-    } // <--- PASTIKAN KURUNG KURAWAL PENUTUP FUNGSI BUKAMODUL INI TETAP ADA
-            
-            // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
-            if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
-                document.getElementById('blokBukanPiket').style.display = 'none';
-                document.getElementById('blokPiketAktif').style.display = 'block';
-                if(document.getElementById('namaGuruPiket')) {
-                    document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
-                }
-                fokusScannerUSB(); 
-                mulaiLiveScanner(); // <--- TAMBAHKAN KAMERA DI SINI SAJA MAS BRO
-            } else {
-                document.getElementById('blokBukanPiket').style.display = 'block';
-                document.getElementById('blokPiketAktif').style.display = 'none';
-            }
-        }
-        }
-    }
+    } // <--- PENUTUP FUNGSI BUKAMODUL (PASTIKAN HANYA ADA SATU)
 
     // ================= E-BANKING ORTU =================
     function fetchAnak() { 
