@@ -522,20 +522,15 @@
             </div>
 
             <!-- ANIMASI RADAR EKSKLUSIF (TANPA KAMERA LIVE) -->
-            <div class="card border-0 shadow-sm rounded-4 p-5 text-center mb-4 bg-white" style="position: relative; overflow: hidden;" onclick="fokusScannerUSB()">
-                <div style="width: 130px; height: 130px; border-radius: 50%; background: rgba(139,0,0,0.05); margin: 0 auto 25px auto; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite; box-shadow: 0 0 0 0 rgba(139,0,0,0.2);">
-                    <i class="bi bi-qr-code-scan text-danger" style="font-size: 3.5rem;"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Tap Kartu E-Student</h5>
-                <p class="small text-muted mb-4">Arahkan scanner fisik (USB), atau gunakan tombol pintar di bawah jika memakai HP.</p>
+           <!-- LIVE KAMERA SCANNER -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-center mb-4 bg-white">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-camera-video-fill text-danger me-2"></i>Live Scanner Kehadiran</h5>
+                <p class="small text-muted mb-3">Arahkan kamera ke QR Code ID Card Siswa</p>
                 
-                <!-- TOMBOL BUKA KAMERA BAWAAN HP (TIDAK MINTA IZIN BROWSER) -->
-                <label class="btn-emboss px-4 py-3 d-inline-flex align-items-center justify-content-center w-auto shadow" style="cursor: pointer; border-radius: 50px;">
-                    <i class="bi bi-camera-fill fs-5 me-2"></i> Kamera Pintar
-                    <input type="file" accept="image/*" capture="environment" id="fileQrInput" style="display:none;" onchange="prosesGambarQR(event)">
-                </label>
+                <!-- Wadah preview kamera -->
+                <div id="reader" class="mx-auto shadow-sm" style="width: 100%; max-width: 350px; border-radius: 15px; overflow: hidden; border: 2px dashed var(--warna-tema);"></div>
                 
-                <!-- JEBAKAN SCANNER FISIK USB -->
+                <!-- Jebakan untuk alat Scanner Fisik USB (jika ada) -->
                 <input type="text" id="inputScannerUSB" style="position:absolute; top:-9999px; left:-9999px;" onchange="kirimDataKehadiran(this.value); this.value='';">
             </div>
             
@@ -750,7 +745,11 @@
     if (s.includes('-')) { let p = s.split('-'); return p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0]); } 
     return new Date(s); 
 }
-    function tutupModul() { document.getElementById('halamanModul').style.display = 'none'; document.getElementById('halamanDashboard').style.display = 'block'; }
+    function tutupModul() { 
+        if (typeof hentikanLiveScanner === 'function') hentikanLiveScanner(); // Tambahkan baris ini
+        document.getElementById('halamanModul').style.display = 'none'; 
+        document.getElementById('halamanDashboard').style.display = 'block'; 
+    }
     function previewFile(inputId, ikonId, teksId) { const f = document.getElementById(inputId).files[0]; if(f){ document.getElementById(ikonId).className="bi bi-check-circle-fill fs-1 text-success"; document.getElementById(teksId).innerText=f.name; document.getElementById(teksId).className="small fw-bold mt-2 mb-0 text-success"; document.getElementById(inputId).parentElement.style.borderColor="#198754"; } }
     const toBase64 = file => new Promise((resolve, reject) => { const r = new FileReader(); r.readAsDataURL(file); r.onload = () => resolve(r.result); r.onerror = e => reject(e); });
     
@@ -1954,6 +1953,16 @@ function fokusScannerUSB() {
     let inp = document.getElementById('inputScannerUSB');
     if(inp) inp.focus();
 }
+    // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
+            if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
+                document.getElementById('blokBukanPiket').style.display = 'none';
+                document.getElementById('blokPiketAktif').style.display = 'block';
+                if(document.getElementById('namaGuruPiket')) {
+                    document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
+                }
+                fokusScannerUSB(); 
+                mulaiLiveScanner(); // <--- TAMBAHKAN PEMICU KAMERA DI SINI
+            } else {
 
 // MESIN PEMBACA QR NATIVE (Dari foto yang baru dijepret)
 function prosesGambarQR(event) {
@@ -2011,6 +2020,34 @@ function bukaModalManualAbsen() {
         }
     });
 }
+    // ================= MESIN LIVE SCANNER =================
+    let liveScanner = null;
+
+    function mulaiLiveScanner() {
+        // Mencegah kamera terbuka dua kali
+        if (!liveScanner) {
+            liveScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+            liveScanner.render(onScanSuccessLive, (err) => { /* Abaikan error pencarian fokus QR */ });
+        }
+    }
+
+    function hentikanLiveScanner() {
+        if (liveScanner) {
+            liveScanner.clear().catch(err => console.log("Kamera ditutup."));
+            liveScanner = null;
+        }
+    }
+
+    function onScanSuccessLive(decodedText, decodedResult) {
+        // 1. Hentikan kamera sementara agar tidak scan berkali-kali dalam 1 detik
+        hentikanLiveScanner(); 
+        
+        // 2. Kirim data absensi ke server (memakai fungsi yang sudah ada)
+        kirimDataKehadiran(decodedText); 
+        
+        // 3. Nyalakan lagi kameranya setelah 3 detik untuk siswa berikutnya
+        setTimeout(mulaiLiveScanner, 3000); 
+    }
       </script>
 </body>
 </html>
