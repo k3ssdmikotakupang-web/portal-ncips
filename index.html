@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Portal ERP NCIPS</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Menggunakan CDNJS agar aman dari blokir Tracking Prevention -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+  
   <!-- Mesin Pengubah Gambar -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <!-- Scanner QR Code versi spesifik -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  
   <style>
     :root { --warna-tema: #8B0000; }
     body { background-color: #f8f9fc; font-family: 'Segoe UI', sans-serif; touch-action: pan-y; overflow-x: hidden; }
@@ -818,11 +824,25 @@
         else if(modulId === 'rekening') { document.getElementById('judulModul').innerText="Rekening Bank"; document.getElementById('areaRekeningBank').style.display='block'; tarikDataRekening(); }
         else if(modulId === 'verifikasi') { document.getElementById('judulModul').innerText="Verifikasi PPDB"; document.getElementById('areaMejaVerifikasi').style.display='block'; loadMejaVerifikasi(); }
         
-        // JALUR BARU UNTUK ORTU & GURU
-        else if(modulId === 'ppdb_ortu') { document.getElementById('judulModul').innerText="PPDB & Mutasi"; document.getElementById('areaPPDBOrtu').style.display='block'; loadDashboardPPDB(); }
+       else if(modulId === 'ppdb_ortu') { document.getElementById('judulModul').innerText="PPDB & Mutasi"; document.getElementById('areaPPDBOrtu').style.display='block'; loadDashboardPPDB(); }
         else if(modulId === 'mutasi_ortu') { document.getElementById('judulModul').innerText="Mutasi Siswa"; document.getElementById('areaMutasiOrtu').style.display='block'; }
-        else if(modulId === 'ruang_guru' || modulId === 'absensi_qr') { document.getElementById('judulModul').innerText="Ruang Guru"; document.getElementById('areaRuangGuru').style.display='block'; }
-    }
+        else if(modulId === 'ruang_guru' || modulId === 'absensi_qr') { 
+            document.getElementById('judulModul').innerText="Ruang Guru & Kehadiran"; 
+            document.getElementById('areaRuangGuru').style.display='block'; 
+            
+            // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
+            if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
+                document.getElementById('blokBukanPiket').style.display = 'none';
+                document.getElementById('blokPiketAktif').style.display = 'block';
+                if(document.getElementById('namaGuruPiket')) {
+                    document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
+                }
+                fokusScannerUSB(); 
+            } else {
+                document.getElementById('blokBukanPiket').style.display = 'block';
+                document.getElementById('blokPiketAktif').style.display = 'none';
+            }
+        }
 
     // ================= E-BANKING ORTU =================
     function fetchAnak() { 
@@ -1927,28 +1947,6 @@
             }
         }
     });
-
-// Fungsi dipanggil saat menu Ruang Guru diklik
-function bukaModulAbsensi() {
-    document.getElementById('halamanDashboard').style.display = 'none'; 
-    document.getElementById('halamanModul').style.display = 'block';
-    
-    // Tutup semua ruangan, buka ruang guru
-    document.querySelectorAll('[id^="area"]').forEach(el => el.style.display = 'none');
-    document.getElementById('areaRuangGuru').style.display = 'block';
-    document.getElementById('judulModul').innerText = "Ruang Guru & Kehadiran";
-
-    // Cek status piket dari data login
-    if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
-        document.getElementById('blokBukanPiket').style.display = 'none';
-        document.getElementById('blokPiketAktif').style.display = 'block';
-        document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
-        fokusScannerUSB(); // Tarik fokus ke scanner fisik
-    } else {
-        document.getElementById('blokBukanPiket').style.display = 'block';
-        document.getElementById('blokPiketAktif').style.display = 'none';
-    }
-}
 
 // Menarik fokus kursor diam-diam untuk Scanner Barcode USB
 function fokusScannerUSB() {
