@@ -129,6 +129,38 @@
     70% { box-shadow: 0 0 0 30px rgba(139,0,0,0); }
     100% { box-shadow: 0 0 0 0 rgba(139,0,0,0); }
     }
+    /* ====================================================== */
+    /* STYLE SCANNER PREMIUM (ELEGANCE & VIEWFINDER) */
+    /* ====================================================== */
+    #reader { border: none !important; background: transparent !important; }
+    #reader video { object-fit: cover !important; border-radius: 20px !important; }
+    #reader__dashboard_section_csr span { font-weight: 600 !important; color: #495057 !important; }
+    #reader__dashboard_section_swaplink { color: var(--warna-tema) !important; text-decoration: none !important; font-weight: bold; margin-top: 10px; display: inline-block; }
+    
+    /* Tombol Start/Stop bawaan library kita sulap jadi elegan */
+    #reader button { 
+        background: linear-gradient(145deg, var(--warna-tema), #500000) !important; 
+        color: white !important; 
+        border: none !important; 
+        padding: 10px 24px !important; 
+        border-radius: 50px !important; 
+        font-weight: 700 !important; 
+        transition: 0.2s !important; 
+        box-shadow: 0 8px 15px rgba(139,0,0,0.2) !important; 
+        margin: 5px !important;
+    }
+    #reader button:active { transform: translateY(2px) !important; box-shadow: 0 4px 8px rgba(139,0,0,0.1) !important; }
+    
+    /* Efek Bingkai Kamera & Laser */
+    .scanner-container { position: relative; background: #000; }
+    .scanner-laser { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ff3b30; box-shadow: 0 0 15px 3px rgba(255, 59, 48, 0.7); animation: scanLaser 2.5s infinite ease-in-out; z-index: 10; }
+    @keyframes scanLaser { 0% { top: 10%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
+    
+    .viewfinder-corner { position: absolute; width: 35px; height: 35px; border-color: rgba(255, 255, 255, 0.9); border-style: solid; z-index: 10; pointer-events: none; }
+    .viewfinder-corner.tl { top: 15px; left: 15px; border-width: 4px 0 0 4px; border-top-left-radius: 12px; }
+    .viewfinder-corner.tr { top: 15px; right: 15px; border-width: 4px 4px 0 0; border-top-right-radius: 12px; }
+    .viewfinder-corner.bl { bottom: 15px; left: 15px; border-width: 0 0 4px 4px; border-bottom-left-radius: 12px; }
+    .viewfinder-corner.br { bottom: 15px; right: 15px; border-width: 0 4px 4px 0; border-bottom-right-radius: 12px; }
     
   </style>
 </head>
@@ -522,13 +554,29 @@
             </div>
 
             <!-- ANIMASI RADAR EKSKLUSIF (TANPA KAMERA LIVE) -->
-           <!-- LIVE KAMERA SCANNER -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 text-center mb-4 bg-white">
-                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-camera-video-fill text-danger me-2"></i>Live Scanner Kehadiran</h5>
-                <p class="small text-muted mb-3">Arahkan kamera ke QR Code ID Card Siswa</p>
+           <!-- LIVE KAMERA SCANNER ELEGAN -->
+            <div class="card border-0 rounded-4 p-4 mb-4 bg-white" style="box-shadow: 0 15px 35px rgba(139,0,0,0.08);">
+                <div class="d-flex justify-content-center align-items-center mb-4">
+                    <div style="background: color-mix(in srgb, var(--warna-tema) 10%, transparent); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                        <i class="bi bi-upc-scan fs-3" style="color: var(--warna-tema);"></i>
+                    </div>
+                    <div class="text-start">
+                        <h5 class="fw-bold text-dark mb-0">Portal Kehadiran</h5>
+                        <small class="text-muted">Arahkan ID Card ke area bidikan</small>
+                    </div>
+                </div>
                 
-                <!-- Wadah preview kamera -->
-                <div id="reader" class="mx-auto shadow-sm" style="width: 100%; max-width: 350px; border-radius: 15px; overflow: hidden; border: 2px dashed var(--warna-tema);"></div>
+                <!-- Wadah Scanner Premium -->
+                <div class="scanner-container mx-auto mt-2" style="width: 100%; max-width: 320px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
+                    <div id="reader" style="width: 100%;"></div>
+                    <!-- Efek Laser Melayang -->
+                    <div class="scanner-laser"></div>
+                    <!-- Sudut Viewfinder -->
+                    <div class="viewfinder-corner tl"></div>
+                    <div class="viewfinder-corner tr"></div>
+                    <div class="viewfinder-corner bl"></div>
+                    <div class="viewfinder-corner br"></div>
+                </div>
                 
                 <!-- Jebakan untuk alat Scanner Fisik USB (jika ada) -->
                 <input type="text" id="inputScannerUSB" style="position:absolute; top:-9999px; left:-9999px;" onchange="kirimDataKehadiran(this.value); this.value='';">
