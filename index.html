@@ -817,6 +817,7 @@
                 document.getElementById('bTab_validasi').style.display = 'inline-block'; document.getElementById('bTab_tunai').style.display = 'inline-block'; fetchSiswaTunai(); switchTabKasir('validasi');
             }
         }
+          
         else if(modulId === 'buat_kontrak') { document.getElementById('judulModul').innerText="Buat Kontrak"; document.getElementById('areaBuatKontrak').style.display='block'; persiapanBuatKontrak(); }
         else if(modulId === 'edit_diskon') { document.getElementById('judulModul').innerText="Pengajuan Kontrak"; document.getElementById('areaEditDiskon').style.display='block'; switchTabPengajuan('draft'); }
         else if(modulId === 'meja_yayasan') { document.getElementById('judulModul').innerText="ACC Tagihan"; document.getElementById('areaMejaYayasan').style.display='block'; tarikDataYayasan(); }
@@ -841,6 +842,24 @@
                 document.getElementById('blokBukanPiket').style.display = 'block';
                 document.getElementById('blokPiketAktif').style.display = 'none';
             }
+          else if(modulId === 'ruang_guru' || modulId === 'absensi_qr') { 
+            document.getElementById('judulModul').innerText="Ruang Guru & Kehadiran"; 
+            document.getElementById('areaRuangGuru').style.display='block'; 
+            
+            // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
+            if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
+                document.getElementById('blokBukanPiket').style.display = 'none';
+                document.getElementById('blokPiketAktif').style.display = 'block';
+                if(document.getElementById('namaGuruPiket')) {
+                    document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
+                }
+                fokusScannerUSB(); 
+                mulaiLiveScanner(); // <--- TAMBAHKAN KAMERA DI SINI SAJA MAS BRO
+            } else {
+                document.getElementById('blokBukanPiket').style.display = 'block';
+                document.getElementById('blokPiketAktif').style.display = 'none';
+            }
+        }
         }
     }
 
@@ -1953,16 +1972,6 @@ function fokusScannerUSB() {
     let inp = document.getElementById('inputScannerUSB');
     if(inp) inp.focus();
 }
-    // LOGIKA PENGECEKAN GURU PIKET DIMASUKKAN KE SINI
-            if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
-                document.getElementById('blokBukanPiket').style.display = 'none';
-                document.getElementById('blokPiketAktif').style.display = 'block';
-                if(document.getElementById('namaGuruPiket')) {
-                    document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
-                }
-                fokusScannerUSB(); 
-                mulaiLiveScanner(); // <--- TAMBAHKAN PEMICU KAMERA DI SINI
-            } else {
 
 // MESIN PEMBACA QR NATIVE (Dari foto yang baru dijepret)
 function prosesGambarQR(event) {
