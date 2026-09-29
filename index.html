@@ -117,6 +117,12 @@
     .stepper-text { font-size: 0.65rem; font-weight: 800; text-align: center; margin-top: 10px; color: #adb5bd; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
     .stepper-item.completed .stepper-text { color: #198754; }
     .stepper-item.active .stepper-text { color: var(--warna-tema); }
+
+    @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(139,0,0,0.4); }
+    70% { box-shadow: 0 0 0 30px rgba(139,0,0,0); }
+    100% { box-shadow: 0 0 0 0 rgba(139,0,0,0); }
+    }
     
   </style>
 </head>
@@ -2032,7 +2038,92 @@ function muatDashboardKeterlambatan() {
     // Lalu merender angka ke elemen id="angkaTelatSiswa" dan id="listKeterlambatanHariIni"
     document.getElementById('listKeterlambatanHariIni').innerHTML = "Data sedang disiapkan dari backend...";
 }
-   
+
+    // Fungsi dipanggil saat menu Ruang Guru diklik
+function bukaModulAbsensi() {
+    document.getElementById('halamanDashboard').style.display = 'none'; 
+    document.getElementById('halamanModul').style.display = 'block';
+    
+    // Tutup semua ruangan, buka ruang guru
+    document.querySelectorAll('[id^="area"]').forEach(el => el.style.display = 'none');
+    document.getElementById('areaRuangGuru').style.display = 'block';
+    document.getElementById('judulModul').innerText = "Ruang Guru & Kehadiran";
+
+    // Cek status piket dari data login
+    if (dataUserGlobal.user.isPiketHariIni || dataUserGlobal.user.role.toLowerCase().includes('admin')) {
+        document.getElementById('blokBukanPiket').style.display = 'none';
+        document.getElementById('blokPiketAktif').style.display = 'block';
+        document.getElementById('namaGuruPiket').innerText = dataUserGlobal.user.nama;
+        fokusScannerUSB(); // Tarik fokus ke scanner fisik
+    } else {
+        document.getElementById('blokBukanPiket').style.display = 'block';
+        document.getElementById('blokPiketAktif').style.display = 'none';
+    }
+}
+
+// Menarik fokus kursor diam-diam untuk Scanner Barcode USB
+function fokusScannerUSB() {
+    let inp = document.getElementById('inputScannerUSB');
+    if(inp) inp.focus();
+}
+
+// MESIN PEMBACA QR NATIVE (Dari foto yang baru dijepret)
+function prosesGambarQR(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    SwalMin.fire({title: 'Memeriksa Kartu...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+    
+    // Gunakan library html5-qrcode
+    const html5QrCode = new Html5Qrcode("wadahKosong");
+    html5QrCode.scanFile(file, true)
+        .then(decodedText => {
+            kirimDataKehadiran(decodedText);
+            event.target.value = ''; // Reset input
+        })
+        .catch(err => {
+            SwalMin.fire('Gagal', 'QR tidak terbaca. Pastikan kamera fokus atau gunakan Input Manual.', 'error');
+            event.target.value = '';
+        });
+}
+
+function kirimDataKehadiran(identitas) {
+    if(!identitas || identitas.trim() === "") return;
+    SwalMin.fire({title: 'Merekam...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+    
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            action: "simpan_keterlambatan", 
+            tenantDbAbsensiId: dataUserGlobal.tenant.idDbAbsensi,
+            dataScan: [identitas, new Date().toLocaleTimeString('id-ID'), dataUserGlobal.user.nama] 
+        })
+    }).then(r => r.json()).then(res => {
+        if(res.status === 'success') {
+            Swal.fire({icon: 'success', title: 'Hadir!', text: identitas, timer: 2000, showConfirmButton: false});
+            fokusScannerUSB();
+        } else {
+            SwalMin.fire('Gagal', res.pesan, 'error');
+        }
+    }).catch(err => SwalMin.fire('Gagal', err.message, 'error'));
+}
+
+// Solusi Anak Lupa Kartu
+function bukaModalManualAbsen() {
+    Swal.fire({
+        title: 'Input Kehadiran Manual',
+        input: 'text',
+        inputPlaceholder: 'Ketik Nama atau NISN...',
+        showCancelButton: true,
+        confirmButtonText: 'Hadirkan',
+        confirmButtonColor: '#198754'
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            kirimDataKehadiran(result.value);
+        }
+    });
+}
+    
   </script>
 </body>
 </html>
