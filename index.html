@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Portal ERP NCIPS</title>
@@ -488,17 +489,65 @@
     </div>
 
     <!-- AREA RUANG GURU -->
-    <div id="areaRuangGuru" style="display: none; padding: 20px;">
-       <div class="alert alert-primary border-0 shadow-sm rounded-4 p-3 mb-4">
-           <h6 class="fw-bold mb-1"><i class="bi bi-journal-bookmark-fill me-2"></i>Ruang Guru & Jurnal Kelas</h6>
-           <p class="small mb-0">Kelola absensi, nilai, dan perkembangan sosial-emosional siswa.</p>
+    <!-- AREA RUANG GURU & SCANNER -->
+<div id="areaRuangGuru" style="display: none; padding: 20px;">
+   <div class="alert alert-primary border-0 shadow-sm rounded-4 p-3 mb-4">
+       <h6 class="fw-bold mb-1"><i class="bi bi-qr-code-scan me-2"></i>Sistem Kehadiran NCIPS</h6>
+       <p class="small mb-0" id="infoPiketTeks">Hanya aktif untuk Guru Piket hari ini.</p>
+   </div>
+
+   <!-- Tab Navigasi -->
+   <div class="tab-keuangan mb-3" id="tabNavAbsensi">
+      <button class="tab-btn active" id="btnTab_scan" onclick="switchTabAbsensi('scan')">Scan QR</button>
+      <button class="tab-btn" id="btnTab_manual" onclick="switchTabAbsensi('manual')">Input Manual</button>
+      <button class="tab-btn" id="btnTab_dashboardAbsen" style="display: none;" onclick="switchTabAbsensi('dashboardAbsen')">Dashboard Keterlambatan</button>
+   </div>
+
+   <!-- Tab 1: SCAN QR -->
+   <div id="tabContent_scan">
+       <div class="card border-0 shadow-sm rounded-4 p-3 text-center mb-4">
+           <div id="reader" width="100%" class="mb-3 rounded-3 overflow-hidden border border-2 border-primary"></div>
+           <button class="btn btn-primary fw-bold rounded-pill px-4 shadow-sm" id="btnStartScan" onclick="mulaiScanQR()"><i class="bi bi-camera-video"></i> Mulai Kamera</button>
        </div>
-       <div class="text-center text-muted p-5 bg-white rounded-4 shadow-sm">
-           <i class="bi bi-tools fs-1 text-secondary mb-3"></i>
-           <h5 class="fw-bold">Sedang Dibangun</h5>
-           <p class="small">Fitur scan absensi dan buku nilai harian sedang disiapkan.</p>
+   </div>
+
+   <!-- Tab 2: INPUT MANUAL (Solusi Lupa Kartu) -->
+   <div id="tabContent_manual" style="display: none;">
+       <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+           <h6 class="fw-bold text-dark mb-3"><i class="bi bi-keyboard text-warning me-2"></i>Lupa E-Student Card?</h6>
+           <p class="small text-muted mb-3">Cari nama siswa atau masukkan NISN secara manual.</p>
+           <div class="input-group mb-3 shadow-sm rounded-pill overflow-hidden">
+               <span class="input-group-text bg-light border-0 ps-4"><i class="bi bi-search text-muted"></i></span>
+               <input type="text" class="form-control bg-light border-0 py-3" id="cariSiswaManual" placeholder="Ketik Nama / NISN...">
+               <button class="btn btn-warning fw-bold text-dark px-4" onclick="prosesAbsenManual()">Hadirkan</button>
+           </div>
        </div>
-    </div>
+   </div>
+
+   <!-- Tab 3: DASHBOARD KETERLAMBATAN (Khusus Guru/Admin) -->
+   <div id="tabContent_dashboardAbsen" style="display: none;">
+       <div class="row g-2 mb-3">
+           <div class="col-6">
+               <div class="bg-danger text-white p-3 rounded-4 shadow-sm text-center">
+                   <h3 class="fw-bold mb-0" id="angkaTelatSiswa">0</h3>
+                   <small>Siswa Telat</small>
+               </div>
+           </div>
+           <div class="col-6">
+               <div class="bg-warning text-dark p-3 rounded-4 shadow-sm text-center">
+                   <h3 class="fw-bold mb-0" id="angkaTelatGuru">0</h3>
+                   <small>Guru Telat</small>
+               </div>
+           </div>
+       </div>
+       <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+           <h6 class="fw-bold text-dark mb-2">Riwayat Hari Ini</h6>
+           <div id="listKeterlambatanHariIni">
+               <p class="small text-muted text-center mt-2">Memuat data...</p>
+           </div>
+       </div>
+   </div>
+</div>
 
     <!-- AREA BUAT KONTRAK -->
     <div id="areaBuatKontrak" style="display: none; padding: 20px;">
@@ -1884,6 +1933,117 @@
             }
         }
     });
+
+    let html5QrcodeScanner;
+
+function switchTabAbsensi(tab) {
+    // Reset tampilan tab
+    document.getElementById('btnTab_scan').classList.remove('active');
+    document.getElementById('btnTab_manual').classList.remove('active');
+    if(document.getElementById('btnTab_dashboardAbsen')) document.getElementById('btnTab_dashboardAbsen').classList.remove('active');
+    
+    document.getElementById('tabContent_scan').style.display = 'none';
+    document.getElementById('tabContent_manual').style.display = 'none';
+    document.getElementById('tabContent_dashboardAbsen').style.display = 'none';
+    
+    // Aktifkan tab yang dipilih
+    document.getElementById('btnTab_' + tab).classList.add('active');
+    document.getElementById('tabContent_' + tab).style.display = 'block';
+
+    // Matikan kamera jika pindah dari tab scan
+    if(tab !== 'scan' && html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+        document.getElementById('btnStartScan').style.display = 'inline-block';
+    }
+
+    if(tab === 'dashboardAbsen') {
+        muatDashboardKeterlambatan(); // Panggil fungsi tarik data keterlambatan dari backend
+    }
+}
+
+// ==========================================
+// LOGIKA PEMBATASAN GURU PIKET & HAK AKSES
+// ==========================================
+function bukaModulAbsensi() {
+    const roleUser = dataUserGlobal.user.role.toLowerCase();
+    
+    // 1. Tampilkan Tab Dashboard HANYA untuk Guru/Admin
+    if (roleUser.includes('guru') || roleUser.includes('admin') || roleUser.includes('kepala')) {
+        document.getElementById('btnTab_dashboardAbsen').style.display = 'inline-block';
+    } else {
+        document.getElementById('btnTab_dashboardAbsen').style.display = 'none';
+    }
+
+    // 2. Cek apakah user adalah Guru Piket hari ini
+    // (Bisa dikembangkan dengan menarik data jadwal dari DB_Jadwal_Piket di Google Sheets)
+    let isPiketHariIni = roleUser.includes('piket') || roleUser.includes('admin'); 
+    
+    if (!isPiketHariIni && roleUser.includes('guru')) {
+        // Jika guru biasa (bukan piket), matikan fungsi scan dan manual
+        document.getElementById('btnStartScan').disabled = true;
+        document.getElementById('cariSiswaManual').disabled = true;
+        document.querySelector('#tabContent_manual button').disabled = true;
+        document.getElementById('infoPiketTeks').innerHTML = "<b class='text-danger'>Akses Ditolak.</b> Anda tidak terdaftar sebagai Guru Piket hari ini.";
+    } else {
+        document.getElementById('btnStartScan').disabled = false;
+        document.getElementById('cariSiswaManual').disabled = false;
+        document.querySelector('#tabContent_manual button').disabled = false;
+        document.getElementById('infoPiketTeks').innerHTML = "Mode Guru Piket Aktif. Silakan scan kartu siswa.";
+    }
+
+    switchTabAbsensi('scan');
+}
+
+// ==========================================
+// MESIN SCANNER QR
+// ==========================================
+function mulaiScanQR() {
+    document.getElementById('btnStartScan').style.display = 'none';
+    html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+    
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    html5QrcodeScanner.clear(); // Hentikan kamera setelah berhasil
+    document.getElementById('btnStartScan').style.display = 'inline-block';
+    
+    // Kirim data ke backend Code.gs
+    kirimDataKehadiran(decodedText);
+}
+
+function onScanFailure(error) {
+    // Abaikan error saat proses mencari QR
+}
+
+// Fungsi manual (Siswa lupa kartu)
+function prosesAbsenManual() {
+    let input = document.getElementById('cariSiswaManual').value;
+    if(!input) return SwalMin.fire('Kosong', 'Masukkan Nama atau NISN', 'warning');
+    kirimDataKehadiran(input);
+    document.getElementById('cariSiswaManual').value = "";
+}
+
+function kirimDataKehadiran(identitas) {
+    SwalMin.fire({title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+    // Panggil fetch ke API_URL milikmu (Code.gs)
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            action: "simpan_keterlambatan", // Sesuaikan dengan action di Code.gs kamu
+            tenantDbAbsensiId: dataUserGlobal.tenant.idDbAbsensi,
+            dataScan: [identitas, new Date().toLocaleTimeString('id-ID'), dataUserGlobal.user.nama] 
+        })
+    }).then(r => r.json()).then(res => {
+        SwalMin.fire('Berhasil', 'Kehadiran Terekam: ' + identitas, 'success');
+    }).catch(err => SwalMin.fire('Gagal', err.message, 'error'));
+}
+
+function muatDashboardKeterlambatan() {
+    // Fungsi ini melakukan fetch() ke API_URL action: 'get_statistik'
+    // Lalu merender angka ke elemen id="angkaTelatSiswa" dan id="listKeterlambatanHariIni"
+    document.getElementById('listKeterlambatanHariIni').innerHTML = "Data sedang disiapkan dari backend...";
+}
    
   </script>
 </body>
