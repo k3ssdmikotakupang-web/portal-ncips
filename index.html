@@ -263,17 +263,18 @@
 
 
 /* WADAH RESPONSIVE HP */
+/* WADAH RESPONSIVE HP */
 .ecard-container {
   display: flex; justify-content: center; align-items: center; padding: 20px 5px; width: 100%;
 }
 
-/* DESAIN PORTRAIT PREMIUM - AZURE & GOLD */
+/* DESAIN PORTRAIT - ROYAL GOLD & MAROON */
 .ecard-premium {
   width: 250px; 
-  height: 390px; /* Proporsi Portrait */
+  height: 390px;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0, 82, 212, 0.15);
+  box-shadow: 0 15px 35px rgba(245, 166, 35, 0.2); /* Soft shadow kuning/emas */
   position: relative;
   overflow: hidden;
   font-family: 'Segoe UI', Roboto, sans-serif;
@@ -284,46 +285,48 @@
   align-items: center;
 }
 
-/* Gelombang Atas Melengkung */
+/* Gelombang Atas Melengkung (Royal Gold) */
 .ecard-premium::before {
   content: ""; position: absolute;
   top: 0; left: 0; right: 0; height: 125px;
-  background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #F5A623 100%);
   border-bottom-left-radius: 50%;
   border-bottom-right-radius: 50%;
   z-index: 1;
-  transform: scaleX(1.2); /* Membuat lengkungan lebih natural */
+  transform: scaleX(1.2); 
 }
 
 /* Teks Header Tengah */
 .ep-header {
-  position: relative; z-index: 3; color: #ffffff; text-align: center; padding-top: 15px; width: 100%;
+  position: relative; z-index: 3; color: #8B0000; /* Teks Maroon khas YPKR */
+  text-align: center; padding-top: 15px; width: 100%; text-shadow: 0 1px 2px rgba(255,255,255,0.3);
 }
 .ep-header h3 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 2px; }
-.ep-header p { margin: 0; font-size: 9px; font-weight: 600; opacity: 0.95; letter-spacing: 1px; }
+.ep-header p { margin: 0; font-size: 9px; font-weight: 800; opacity: 0.95; letter-spacing: 1px; }
 
-/* Foto Tengah dengan Frame Emas */
+/* Foto Tengah dengan Frame Maroon */
 .ep-photo {
   width: 90px; height: 90px;
   background: #ffffff;
   border-radius: 50%; 
-  border: 4px solid #F6D365;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  border: 4px solid #8B0000;
+  box-shadow: 0 8px 16px rgba(139,0,0,0.15);
   display: flex; justify-content: center; align-items: center;
-  font-size: 38px; font-weight: 900; color: #4364F7;
+  font-size: 38px; font-weight: 900; color: #F5A623;
   margin-top: 10px; z-index: 4; position: relative;
 }
 
 /* Data Siswa */
 .ep-info { text-align: center; padding: 15px 15px 0 15px; width: 100%; z-index: 3; }
 .ep-name { font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 5px 0; line-height: 1.2; text-transform: uppercase; }
-.ep-role { display: inline-block; background: #eff6ff; color: #1d4ed8; font-size: 10px; padding: 4px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 5px; border: 1px solid #bfdbfe; }
-.ep-details { font-size: 11px; color: #64748b; font-weight: 600; }
+.ep-role { display: inline-block; background: #fff8e1; color: #8B0000; font-size: 10px; padding: 4px 12px; border-radius: 20px; font-weight: 800; margin-bottom: 5px; border: 1px solid #ffe082; }
+.ep-details { font-size: 11px; color: #64748b; font-weight: 600; line-height: 1.4; }
+.ep-details strong { color: #d97706; } /* Highlight data kelas */
 
 /* QR Code Diperbesar di Bawah */
 .ep-qr-wrap { margin-top: auto; padding-bottom: 20px; z-index: 3; }
 .ep-qr {
-  width: 120px; height: 120px; /* Ukuran QR jauh lebih besar */
+  width: 120px; height: 120px; 
   background: white; padding: 5px;
   border-radius: 10px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.08);
