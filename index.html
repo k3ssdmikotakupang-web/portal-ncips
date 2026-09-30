@@ -1954,43 +1954,41 @@
         setTimeout(mulaiLiveScanner, 3000); 
     }
 
-// Fungsi Pembuat Template HTML Per Kartu (Versi Modern)
 function buatTemplateKartu(data) {
-  // QR Code tanpa margin putih berlebih
+  // Generate QR Code bersih (tanpa margin)
   let qrText = encodeURIComponent(data.nama + " | " + data.nisn);
   let qrUrl = "https://quickchart.io/qr?text=" + qrText + "&size=100&margin=0";
   
-  // Ambil huruf pertama nama untuk avatar jika belum ada foto
+  // Deteksi inisial nama
   let initial = data.nama ? data.nama.charAt(0).toUpperCase() : "U";
   
   return `
-    <div class="ecard-modern">
-      <div class="ecard-watermark">YPKR</div>
-      
-      <div class="ecard-header">
-        <div class="brand">YPKR</div>
-        <div class="unit">NCIPS KUPANG</div>
-      </div>
-      
-      <div class="ecard-body">
-        <div class="ecard-photo">
-          <span style="font-size:24px; font-weight:900; color:#cbd5e1;">${initial}</span>
+    <div class="ecard-container">
+      <div class="ecard-premium">
+        <div class="ep-header">
+          <h3>YPKR</h3>
+          <p>NCIPS KUPANG</p>
         </div>
         
-        <div class="ecard-info">
-          <h2 class="ecard-name">${data.nama}</h2>
-          <div class="ecard-role-badge">${data.role}</div>
-          
-          <div class="ecard-detail-row">
-            <span>ID/NISN</span> <span>: ${data.nisn}</span>
-          </div>
-          <div class="ecard-detail-row">
-            <span>Rombel</span> <span>: ${data.rombel}</span>
+        <div class="ep-body">
+          <div class="ep-photo">${initial}</div>
+          <div class="ep-info">
+            <h2 class="ep-name">${data.nama}</h2>
+            <div class="ep-role">${data.role}</div>
+            
+            <div class="ep-details">
+              <div class="row">
+                <span class="label">NISN/ID</span> <span>: ${data.nisn}</span>
+              </div>
+              <div class="row">
+                <span class="label">Rombel</span> <span>: ${data.rombel}</span>
+              </div>
+            </div>
           </div>
         </div>
+        
+        <img src="${qrUrl}" class="ep-qr" alt="QR Code">
       </div>
-      
-      <img src="${qrUrl}" class="ecard-qr" alt="QR Code">
     </div>
   `;
 }
