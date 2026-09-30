@@ -262,140 +262,83 @@
 }
 
 
-    /* WADAH RESPONSIVE UNTUK TAMPILAN DI HP */
+/* WADAH RESPONSIVE HP */
 .ecard-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px 5px;
-  width: 100%;
+  display: flex; justify-content: center; align-items: center; padding: 20px 5px; width: 100%;
 }
 
-/* DESAIN E-CARD PREMIUM - AZURE & GOLD THEME */
+/* DESAIN PORTRAIT PREMIUM - AZURE & GOLD */
 .ecard-premium {
-  width: 325px; /* Sempurna & ramah untuk layar HP standar (360px) */
-  height: 205px; /* Proporsi standar ID Card */
+  width: 250px; 
+  height: 390px; /* Proporsi Portrait */
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0, 82, 212, 0.15); /* Soft shadow biru */
+  box-shadow: 0 15px 35px rgba(0, 82, 212, 0.15);
   position: relative;
   overflow: hidden;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', Roboto, sans-serif;
   flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.05);
-}
-
-/* Gelombang Biru (Azure) Elegan di Atas */
-.ecard-premium::before {
-  content: "";
-  position: absolute;
-  top: 0; right: 0; left: 0;
-  height: 95px;
-  background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
-  border-bottom-left-radius: 35px;
-  border-bottom-right-radius: 5px;
-  z-index: 1;
-}
-
-/* Aksen Garis Emas (Gold) di bawah gelombang biru */
-.ecard-premium::after {
-  content: "";
-  position: absolute;
-  top: 90px; right: 25px;
-  width: 120px; height: 4px;
-  background: linear-gradient(90deg, #F3A183 0%, #F6D365 100%);
-  border-radius: 5px;
-  z-index: 2;
-}
-
-/* Header Organisasi */
-.ep-header {
-  position: relative;
-  z-index: 3;
-  color: #ffffff;
-  text-align: right;
-  padding: 15px 25px 0 0;
-}
-.ep-header h3 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 1.5px; }
-.ep-header p { margin: 0; font-size: 8px; font-weight: 600; opacity: 0.95; letter-spacing: 0.5px; }
-
-/* Area Konten Data */
-.ep-body {
-  position: relative;
-  z-index: 3;
   display: flex;
-  padding: 5px 20px;
-  gap: 15px;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Tempat Foto Kekinian (Kotak Membulat, bukan sekadar lingkaran) */
+/* Gelombang Atas Melengkung */
+.ecard-premium::before {
+  content: ""; position: absolute;
+  top: 0; left: 0; right: 0; height: 125px;
+  background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+  z-index: 1;
+  transform: scaleX(1.2); /* Membuat lengkungan lebih natural */
+}
+
+/* Teks Header Tengah */
+.ep-header {
+  position: relative; z-index: 3; color: #ffffff; text-align: center; padding-top: 15px; width: 100%;
+}
+.ep-header h3 { margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 2px; }
+.ep-header p { margin: 0; font-size: 9px; font-weight: 600; opacity: 0.95; letter-spacing: 1px; }
+
+/* Foto Tengah dengan Frame Emas */
 .ep-photo {
-  width: 75px; height: 75px;
-  background: #f8f9fa;
-  border-radius: 14px; 
-  border: 3px solid #ffffff;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  width: 90px; height: 90px;
+  background: #ffffff;
+  border-radius: 50%; 
+  border: 4px solid #F6D365;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
   display: flex; justify-content: center; align-items: center;
-  font-size: 32px; font-weight: 900; color: #4364F7;
-  margin-top: -15px; /* Overlap menyentuh area biru */
-  z-index: 4;
-  flex-shrink: 0;
+  font-size: 38px; font-weight: 900; color: #4364F7;
+  margin-top: 10px; z-index: 4; position: relative;
 }
 
-/* Tipografi Informasi */
-.ep-info {
-  padding-top: 15px;
-}
-.ep-name {
-  font-size: 15px;
-  font-weight: 800;
-  color: #1e293b;
-  margin: 0 0 4px 0;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-.ep-role {
-  display: inline-block;
-  background: #eff6ff;
-  color: #1d4ed8;
-  font-size: 9px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  border: 1px solid #bfdbfe;
-}
-.ep-details { font-size: 9px; color: #64748b; line-height: 1.5; }
-.ep-details .row { display: flex; }
-.ep-details span.label { font-weight: 700; color: #475569; width: 55px; }
+/* Data Siswa */
+.ep-info { text-align: center; padding: 15px 15px 0 15px; width: 100%; z-index: 3; }
+.ep-name { font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 5px 0; line-height: 1.2; text-transform: uppercase; }
+.ep-role { display: inline-block; background: #eff6ff; color: #1d4ed8; font-size: 10px; padding: 4px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 5px; border: 1px solid #bfdbfe; }
+.ep-details { font-size: 11px; color: #64748b; font-weight: 600; }
 
-/* QR Code Kanan Bawah */
+/* QR Code Diperbesar di Bawah */
+.ep-qr-wrap { margin-top: auto; padding-bottom: 20px; z-index: 3; }
 .ep-qr {
-  position: absolute;
-  bottom: 12px; right: 20px;
-  width: 50px; height: 50px;
-  background: white; padding: 2px;
-  border-radius: 6px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  width: 120px; height: 120px; /* Ukuran QR jauh lebih besar */
+  background: white; padding: 5px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
   border: 1px solid #e2e8f0;
-  z-index: 3;
 }
 
-/* MODE CETAK (PRINT) - Otomatis konversi piksel ke milimeter standar KTP */
+/* MODE CETAK (PRINT) - CR80 Portrait */
 @media print {
   body * { visibility: hidden; }
   #print-area, #print-area * { visibility: visible; }
-  #print-area {
-    position: absolute; left: 0; top: 0; width: 100%;
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
-  }
+  #print-area { position: absolute; left: 0; top: 0; width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   .ecard-container { padding: 0; width: auto; }
   .ecard-premium {
-    width: 85.6mm; height: 53.98mm;
-    box-shadow: none;
-    border: 1px dashed #ccc; /* Garis bantu potong saat diprint */
-    margin: 2px;
+    width: 53.98mm; height: 85.6mm; 
+    box-shadow: none; border: 1px dashed #ccc; margin: 2px;
   }
 }
     
@@ -1371,68 +1314,7 @@
         .then(r=>r.json()).then(res=>{ if(res.status==='success') { pantauRaw = res.data; renderPantau(pantauRaw); } else wadah.innerHTML = `<p class="text-danger text-center">Gagal memuat data.</p>`; });
     }
 
-    function loadECardData() {
-    const wadah = document.getElementById('wadahDaftarECard');
-    wadah.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted small">Mencetak kartu identitas premium...</p></div>`;
     
-    fetch(API_URL, { 
-        method: "POST", 
-        body: JSON.stringify({ action: 'get_ecard', tenantDbId: dataUserGlobal.tenant.idDatabase, email: dataUserGlobal.user.email, role: dataUserGlobal.user.role.toLowerCase() }) 
-    })
-    .then(r => r.json())
-    .then(res => {
-        if(res.status === 'success') {
-            if(res.data.length === 0) {
-                wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm"><i class="bi bi-exclamation-circle fs-1"></i><br>Data tidak ditemukan di database.</div>`;
-                return;
-            }
-            let html = "";
-            res.data.forEach(profil => {
-                // Generate QR Code bersih tanpa margin putih berlebih
-                let qrTeks = profil.nisn !== "-" ? profil.nisn : profil.nama;
-                let qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrTeks)}&size=150&margin=0`;
-                
-                // Ekstrak Inisial & Rapikan Data
-                let inisial = profil.nama.charAt(0).toUpperCase();
-                let infoRole = profil.nisn !== "-" ? `Siswa` : profil.role;
-                let infoDetail = profil.rombel && profil.rombel !== "-" ? profil.rombel : profil.role;
-                
-                // Suntik HTML desain Premium (Azure & Gold)
-                html += `
-                <div class="ecard-container">
-                  <div class="ecard-premium">
-                    <div class="ep-header">
-                      <h3>YPKR</h3>
-                      <p>${dataUserGlobal.tenant.namaUnitJenjang || "NCIPS KUPANG"}</p>
-                    </div>
-                    
-                    <div class="ep-body">
-                      <div class="ep-photo">${inisial}</div>
-                      <div class="ep-info">
-                        <h2 class="ep-name text-truncate" style="max-width: 140px;" title="${profil.nama}">${profil.nama}</h2>
-                        <div class="ep-role">${infoRole}</div>
-                        
-                        <div class="ep-details">
-                          <div class="row">
-                            <span class="label">ID/NISN</span> <span>: ${profil.nisn !== "-" ? profil.nisn : "-"}</span>
-                          </div>
-                          <div class="row">
-                            <span class="label">Unit/Kls</span> <span class="text-truncate" style="max-width: 90px;">: ${infoDetail}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <img src="${qrUrl}" class="ep-qr" alt="QR Code">
-                  </div>
-                </div>`;
-            });
-            wadah.innerHTML = html;
-        } else {
-            wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">${res.pesan}</div>`;
-        }
-    });
-}
 
     function renderPantau(dataArr) {
         let html = "";
@@ -1988,12 +1870,53 @@
         setTimeout(mulaiLiveScanner, 3000); 
     }
 
+function loadECardData() {
+    const wadah = document.getElementById('wadahDaftarECard');
+    wadah.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted small">Mencetak kartu identitas...</p></div>`;
+    
+    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: 'get_ecard', tenantDbId: dataUserGlobal.tenant.idDatabase, email: dataUserGlobal.user.email, role: dataUserGlobal.user.role.toLowerCase() }) })
+    .then(r => r.json()).then(res => {
+        if(res.status === 'success') {
+            if(res.data.length === 0) return wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">Data tidak ditemukan.</div>`;
+            let html = "";
+            res.data.forEach(profil => {
+                let nisnAman = profil.nisn !== "-" ? profil.nisn : "-";
+                let kelasAman = profil.rombel && profil.rombel !== "-" ? profil.rombel : profil.role;
+                
+                // FORMAT QR BARU: NISN|Nama|Kelas
+                let qrTeks = `${nisnAman}|${profil.nama}|${kelasAman}`;
+                let qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrTeks)}&size=300&margin=1`;
+                let inisial = profil.nama.charAt(0).toUpperCase();
+                
+                html += `
+                <div class="ecard-container">
+                  <div class="ecard-premium">
+                    <div class="ep-header">
+                      <h3>YPKR</h3>
+                      <p>${dataUserGlobal.tenant.namaUnitJenjang || "NCIPS KUPANG"}</p>
+                    </div>
+                    <div class="ep-photo">${inisial}</div>
+                    <div class="ep-info">
+                      <h2 class="ep-name text-truncate" style="max-width: 220px;">${profil.nama}</h2>
+                      <div class="ep-role">${nisnAman !== "-" ? "Siswa" : profil.role}</div>
+                      <div class="ep-details">NISN: ${nisnAman} <br> ${kelasAman}</div>
+                    </div>
+                    <div class="ep-qr-wrap">
+                      <img src="${qrUrl}" class="ep-qr" alt="QR Code">
+                    </div>
+                  </div>
+                </div>`;
+            });
+            wadah.innerHTML = html;
+        } else wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">${res.pesan}</div>`;
+    });
+}
+
 function buatTemplateKartu(data) {
-  // Generate QR Code bersih (tanpa margin)
-  let qrText = encodeURIComponent(data.nama + " | " + data.nisn);
-  let qrUrl = "https://quickchart.io/qr?text=" + qrText + "&size=100&margin=0";
-  
-  // Deteksi inisial nama
+  let nisnAman = data.nisn !== "-" ? data.nisn : "-";
+  let kelasAman = data.rombel && data.rombel !== "-" ? data.rombel : data.role;
+  let qrTeks = `${nisnAman}|${data.nama}|${kelasAman}`;
+  let qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrTeks)}&size=300&margin=1`;
   let initial = data.nama ? data.nama.charAt(0).toUpperCase() : "U";
   
   return `
@@ -2003,29 +1926,20 @@ function buatTemplateKartu(data) {
           <h3>YPKR</h3>
           <p>NCIPS KUPANG</p>
         </div>
-        
-        <div class="ep-body">
-          <div class="ep-photo">${initial}</div>
-          <div class="ep-info">
-            <h2 class="ep-name">${data.nama}</h2>
-            <div class="ep-role">${data.role}</div>
-            
-            <div class="ep-details">
-              <div class="row">
-                <span class="label">NISN/ID</span> <span>: ${data.nisn}</span>
-              </div>
-              <div class="row">
-                <span class="label">Rombel</span> <span>: ${data.rombel}</span>
-              </div>
-            </div>
-          </div>
+        <div class="ep-photo">${initial}</div>
+        <div class="ep-info">
+          <h2 class="ep-name text-truncate" style="max-width: 220px;">${data.nama}</h2>
+          <div class="ep-role">${nisnAman !== "-" ? "Siswa" : data.role}</div>
+          <div class="ep-details">NISN: ${nisnAman} <br> ${kelasAman}</div>
         </div>
-        
-        <img src="${qrUrl}" class="ep-qr" alt="QR Code">
+        <div class="ep-qr-wrap">
+          <img src="${qrUrl}" class="ep-qr" alt="QR Code">
+        </div>
       </div>
     </div>
   `;
 }
+    
 
 // Fungsi Eksekusi Cetak Massal (Panggil fungsi ini di tombol "Cetak Semua E-Card")
 function cetakMassalSemuaECard() {
