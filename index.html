@@ -116,9 +116,117 @@
     .ecard-photo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #d4af37; object-fit: cover; margin-bottom: 15px; background: #fff; padding: 2px; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
     .ecard-qr { background: white; padding: 10px; border-radius: 12px; margin-top: 20px; width: 130px; height: 130px; }
     .ecard-gold-text { color: #d4af37; font-weight: bold; letter-spacing: 1px; font-size: 0.75rem; text-transform: uppercase; }
+
+    /* DESAIN E-CARD UKURAN E-KTP (85.6mm x 53.98mm) */
+.ektp-card {
+  width: 85.6mm;
+  height: 53.98mm;
+  background: linear-gradient(135deg, #ffffff 0%, #f4f6f9 100%);
+  border: 1px solid #ccc;
+  border-radius: 8px; /* Sudut membulat seperti KTP */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin: 10px;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+/* Header warna Yayasan (Dark Red) */
+.ektp-header {
+  background-color: #8B0000; 
+  color: #fff;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ektp-header span { display: block; font-size: 8px; font-weight: normal; letter-spacing: 0; }
+
+.ektp-body {
+  padding: 8px 12px;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Tempat Pas Foto */
+.ektp-photo {
+  width: 22mm;
+  height: 28mm;
+  background: #e9ecef;
+  border: 1px solid #adb5bd;
+  border-radius: 4px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #6c757d;
+}
+
+/* Teks Detail */
+.ektp-details {
+  flex-grow: 1;
+  font-size: 9px;
+  line-height: 1.5;
+  color: #333;
+}
+.ektp-details table { width: 100%; border-collapse: collapse; }
+.ektp-details td { vertical-align: top; padding-bottom: 2px; }
+.ektp-details td:first-child { font-weight: bold; width: 45px; }
+.ektp-details td:nth-child(2) { width: 5px; }
+
+/* QR Code Placeholder di Pojok Kanan Bawah */
+.ektp-qr {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  width: 18mm;
+  height: 18mm;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+}
+.ektp-footer-role {
+  position: absolute;
+  bottom: 8px;
+  left: 38mm;
+  font-size: 14px;
+  font-weight: 900;
+  color: #8B0000;
+  text-transform: uppercase;
+}
+
+/* PENGATURAN CETAK (PRINT) */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .ektp-card { 
+    page-break-inside: avoid; 
+    box-shadow: none; 
+    border: 1px solid #000; /* Garis potong jelas saat dicetak */
+  }
+  /* Sembunyikan elemen web yang tidak perlu */
+  .no-print { display: none !important; }
+}
   </style>
 </head>
 <body>
+  <div id="print-area"></div>
+  
   <!-- PABRIK GAMBAR TERSEMBUNYI -->
   <div id="wadahStruk" style="position:fixed; top:-9999px; left:-9999px; z-index:-1;"></div>
 
@@ -1668,6 +1776,75 @@
         kirimDataKehadiran(decodedText); 
         setTimeout(mulaiLiveScanner, 3000); 
     }
+
+      // Fungsi Pembuat Template HTML Per Kartu
+function buatTemplateKartu(data) {
+  // Buat QR Code dinamis berbasis Nama & NISN
+  let qrText = encodeURIComponent(data.nama + " | " + data.role);
+  let qrUrl = "https://quickchart.io/qr?text=" + qrText + "&size=100";
+  
+  return `
+    <div class="ektp-card">
+      <div class="ektp-header">
+        YAYASAN PENDIDIKAN KRISTO REGI
+        <span>NUSA CENDANA INTERNATIONAL PLUS SCHOOL</span>
+      </div>
+      <div class="ektp-body">
+        <div class="ektp-photo">FOTO</div>
+        <div class="ektp-details">
+          <table>
+            <tr><td>Nama</td><td>:</td><td><b>${data.nama}</b></td></tr>
+            <tr><td>NISN/NIP</td><td>:</td><td>${data.nisn}</td></tr>
+            <tr><td>Rombel</td><td>:</td><td>${data.rombel}</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="ektp-footer-role">${data.role}</div>
+      <img src="${qrUrl}" class="ektp-qr" alt="QR">
+    </div>
+  `;
+}
+
+// Fungsi Eksekusi Cetak Massal (Panggil fungsi ini di tombol "Cetak Semua E-Card")
+function cetakMassalSemuaECard() {
+  // Tampilkan notifikasi loading (Bisa pakai Swal.fire / Alert bawaanmu)
+  console.log("Menarik data seluruh warga sekolah...");
+  
+  let idDatabaseTenant = localStorage.getItem("tenantDbId"); // Sesuaikan dengan cara kamu simpan ID sekolah
+  
+  fetch(URL_API_GAS_KAMU, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'get_all_ecards',
+      tenantDbId: idDatabaseTenant
+    })
+  })
+  .then(response => response.json())
+  .then(res => {
+    if (res.status === 'success') {
+      let printArea = document.getElementById('print-area');
+      printArea.innerHTML = ""; // Bersihkan kanvas
+      
+      // Inject semua kartu ke dalam wadah cetak
+      res.data.forEach(person => {
+        printArea.innerHTML += buatTemplateKartu(person);
+      });
+      
+      // Tunggu gambar QR loading sebentar lalu cetak
+      setTimeout(() => {
+        window.print();
+        printArea.innerHTML = ""; // Bersihkan kembali setelah dialog print ditutup
+      }, 1500);
+      
+    } else {
+      alert("Gagal menarik data: " + res.pesan);
+    }
+  })
+  .catch(err => {
+    alert("Terjadi kesalahan jaringan.");
+  });
+}
+      
   </script>
 </body>
 </html>
