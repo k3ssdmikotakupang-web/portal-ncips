@@ -1840,16 +1840,49 @@
         html5QrCode.scanFile(file, true).then(decodedText => { kirimDataKehadiran(decodedText); event.target.value = ''; }).catch(err => { SwalMin.fire('Gagal', 'QR tidak terbaca. Pastikan kamera fokus atau gunakan Input Manual.', 'error'); event.target.value = ''; });
     }
     function kirimDataKehadiran(identitas) {
-        if(!identitas || identitas.trim() === "") return;
-        SwalMin.fire({title: 'Merekam...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-        fetch(API_URL, {
-            method: "POST",
-            body: JSON.stringify({ action: "simpan_keterlambatan", tenantDbAbsensiId: dataUserGlobal.tenant.idDbAbsensi, dataScan: [identitas, new Date().toLocaleTimeString('id-ID'), dataUserGlobal.user.nama] })
-        }).then(r => r.json()).then(res => {
-            if(res.status === 'success') { Swal.fire({icon: 'success', title: 'Hadir!', text: identitas, timer: 2000, showConfirmButton: false}); fokusScannerUSB(); } 
-            else { SwalMin.fire('Gagal', res.pesan, 'error'); }
-        });
-    }
+    if(!identitas || identitas.trim() === "") return;
+    
+    // Pecah data dari QR Code (Format: NISN|NAMA|KELAS)
+    let parts = identitas.split("|");
+    let nisn = parts[0] || "-";
+    let nama = parts[1] || identitas; // Jaga-jaga jika QR format lama terpindai
+    let kelas = parts[2] || "-";
+    
+    let tanggal = new Date().toLocaleDateString('id-ID'); // Kolom A
+    let waktu = new Date().toLocaleTimeString('id-ID');   // Kolom B
+    let petugas = dataUserGlobal.user.nama;               // Kolom I
+    
+    // ARRAY PAYLOAD (Diurutkan sesuai index Kolom A - I)
+    // A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7, I=8
+    let payloadData = [
+        tanggal,        // A: Tanggal
+        waktu,          // B: Waktu_Tiba
+        nama,           // C: Nama_Siswa
+        nisn,           // D: NISN
+        kelas,          // E: Kelas
+        "Hadir",        // F: Status_Kehadiran
+        "",             // G: (Kosong)
+        "",             // H: (Kosong)
+        petugas         // I: Petugas_Piket
+    ];
+
+    SwalMin.fire({title: 'Merekam...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+    
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ 
+            action: "simpan_keterlambatan", 
+            tenantDbAbsensiId: dataUserGlobal.tenant.idDbAbsensi, 
+            dataScan: payloadData 
+        })
+    }).then(r => r.json()).then(res => {
+        if(res.status === 'success') { 
+            Swal.fire({icon: 'success', title: 'Hadir!', text: nama, timer: 2000, showConfirmButton: false}); 
+            fokusScannerUSB(); 
+        } 
+        else { SwalMin.fire('Gagal', res.pesan, 'error'); }
+    });
+}
     function bukaModalManualAbsen() {
         Swal.fire({ title: 'Input Kehadiran Manual', input: 'text', inputPlaceholder: 'Ketik Nama atau NISN...', showCancelButton: true, confirmButtonText: 'Hadirkan', confirmButtonColor: '#198754' }).then((result) => { if (result.isConfirmed && result.value) { kirimDataKehadiran(result.value); } });
     }
