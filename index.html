@@ -117,110 +117,148 @@
     .ecard-qr { background: white; padding: 10px; border-radius: 12px; margin-top: 20px; width: 130px; height: 130px; }
     .ecard-gold-text { color: #d4af37; font-weight: bold; letter-spacing: 1px; font-size: 0.75rem; text-transform: uppercase; }
 
-    /* DESAIN E-CARD UKURAN E-KTP (85.6mm x 53.98mm) */
-.ektp-card {
+/* DESAIN E-CARD MODERN & PREMIUM (UKURAN CR80: 85.6mm x 53.98mm) */
+.ecard-modern {
   width: 85.6mm;
   height: 53.98mm;
-  background: linear-gradient(135deg, #ffffff 0%, #f4f6f9 100%);
-  border: 1px solid #ccc;
-  border-radius: 8px; /* Sudut membulat seperti KTP */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   position: relative;
   overflow: hidden;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  margin: 10px;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 15px;
   display: inline-block;
   box-sizing: border-box;
+  border: 1px solid #f0f0f0;
 }
 
-/* Header warna Yayasan (Dark Red) */
-.ektp-header {
-  background-color: #8B0000; 
-  color: #fff;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+/* Aksen Gradasi Modern di Bagian Atas (Warna Maroon YPKR) */
+.ecard-modern::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 18mm;
+  background: linear-gradient(135deg, #8B0000 0%, #c0392b 100%);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  z-index: 1;
 }
-.ektp-header span { display: block; font-size: 8px; font-weight: normal; letter-spacing: 0; }
 
-.ektp-body {
-  padding: 8px 12px;
+/* Watermark Tipografi Abstrak di Background */
+.ecard-watermark {
+  position: absolute;
+  right: -10px;
+  bottom: -15px;
+  font-size: 70px;
+  font-weight: 900;
+  color: rgba(139, 0, 0, 0.03);
+  z-index: 0;
+  transform: rotate(-10deg);
+  letter-spacing: -2px;
+}
+
+/* Header Organisasi */
+.ecard-header {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: left;
+  padding: 5px 15px;
+}
+.ecard-header .brand { font-size: 11px; font-weight: 900; letter-spacing: 1px; }
+.ecard-header .unit { font-size: 7px; opacity: 0.9; font-weight: 500; letter-spacing: 0.5px; }
+
+/* Wadah Konten Utama */
+.ecard-body {
+  position: relative;
+  z-index: 2;
+  padding: 12px 15px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  gap: 15px;
 }
 
-/* Tempat Pas Foto */
-.ektp-photo {
+/* Foto Profil (Lingkaran) */
+.ecard-photo {
   width: 22mm;
-  height: 28mm;
-  background: #e9ecef;
-  border: 1px solid #adb5bd;
-  border-radius: 4px;
-  margin-right: 12px;
+  height: 22mm;
+  background: #f8f9fa;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  color: #6c757d;
+  flex-shrink: 0;
+  overflow: hidden;
+  margin-top: -8px; /* Tarik sedikit ke atas menabrak header */
 }
 
-/* Teks Detail */
-.ektp-details {
+/* Tipografi Informasi */
+.ecard-info {
   flex-grow: 1;
-  font-size: 9px;
-  line-height: 1.5;
-  color: #333;
+  padding-right: 15px;
 }
-.ektp-details table { width: 100%; border-collapse: collapse; }
-.ektp-details td { vertical-align: top; padding-bottom: 2px; }
-.ektp-details td:first-child { font-weight: bold; width: 45px; }
-.ektp-details td:nth-child(2) { width: 5px; }
-
-/* QR Code Placeholder di Pojok Kanan Bawah */
-.ektp-qr {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  width: 18mm;
-  height: 18mm;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 4px;
-}
-.ektp-footer-role {
-  position: absolute;
-  bottom: 8px;
-  left: 38mm;
-  font-size: 14px;
-  font-weight: 900;
-  color: #8B0000;
+.ecard-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #2c3e50;
+  margin: 0 0 3px 0;
   text-transform: uppercase;
+  line-height: 1.2;
+}
+.ecard-role-badge {
+  display: inline-block;
+  background: #fdf2f2;
+  color: #8B0000;
+  font-size: 8px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.ecard-detail-row {
+  font-size: 8px;
+  color: #34495e;
+  margin-bottom: 3px;
+  display: flex;
+}
+.ecard-detail-row span:first-child {
+  width: 45px;
+  font-weight: 700;
+  color: #7f8c8d;
 }
 
-/* PENGATURAN CETAK (PRINT) */
+/* QR Code Kanan Bawah */
+.ecard-qr {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  width: 15mm;
+  height: 15mm;
+  background: white;
+  padding: 2px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  z-index: 2;
+}
+
+/* CSS Khusus Mesin Cetak */
 @media print {
   body * { visibility: hidden; }
   #print-area, #print-area * { visibility: visible; }
   #print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    position: absolute; left: 0; top: 0; width: 100%;
+    display: flex; flex-wrap: wrap; justify-content: center;
   }
-  .ektp-card { 
+  .ecard-modern { 
     page-break-inside: avoid; 
     box-shadow: none; 
-    border: 1px solid #000; /* Garis potong jelas saat dicetak */
+    border: 1px solid #ccc; /* Border halus untuk garis potong gunting */
+    margin: 5px;
   }
-  /* Sembunyikan elemen web yang tidak perlu */
-  .no-print { display: none !important; }
 }
   </style>
 </head>
