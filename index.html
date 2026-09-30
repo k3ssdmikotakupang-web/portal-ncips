@@ -1839,30 +1839,83 @@
         const html5QrCode = new Html5Qrcode("wadahKosong");
         html5QrCode.scanFile(file, true).then(decodedText => { kirimDataKehadiran(decodedText); event.target.value = ''; }).catch(err => { SwalMin.fire('Gagal', 'QR tidak terbaca. Pastikan kamera fokus atau gunakan Input Manual.', 'error'); event.target.value = ''; });
     }
-    function kirimDataKehadiran(identitas) {
+
+    function loadECardData() {
+    const wadah = document.getElementById('wadahDaftarECard');
+    wadah.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted small">Mencari data siswa...</p></div>`;
+    
+    // Deteksi jika yang login adalah orang tua, arahkan ke action baru
+    let roleUser = dataUserGlobal.user.role.toLowerCase();
+    let isOrtu = (roleUser.includes('ortu') || roleUser.includes('orang tua') || roleUser === 'user');
+    let targetAction = isOrtu ? 'get_ecard_ortu' : 'get_ecard';
+
+    fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify({ action: targetAction, tenantDbId: dataUserGlobal.tenant.idDatabase, email: dataUserGlobal.user.email, role: roleUser }) 
+    })
+    .then(r => r.json()).then(res => {
+        if(res.status === 'success') {
+            if(res.data.length === 0) return wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">Data anak belum tertaut dengan email Anda di DB_Student.</div>`;
+            
+            let html = "";
+            res.data.forEach(profil => {
+                let nisnAman = profil.nisn || "-";
+                let nipdAman = profil.nipd || "-";
+                // Merapikan format tanggal jika ada (opsional)
+                let tglLahirAman = profil.tglLahir ? new Date(profil.tglLahir).toLocaleDateString('id-ID') : "-";
+                
+                // FORMAT QR: NISN|Nama|NIPD
+                let qrTeks = `${nisnAman}|${profil.nama}|${nipdAman}`;
+                let qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrTeks)}&size=300&margin=1`;
+                let inisial = profil.nama ? profil.nama.charAt(0).toUpperCase() : "U";
+                
+                html += `
+                <div class="ecard-container">
+                  <div class="ecard-premium">
+                    <div class="ep-header">
+                      <h3>YPKR</h3>
+                      <p>${dataUserGlobal.tenant.namaUnitJenjang || "NCIPS KUPANG"}</p>
+                    </div>
+                    <div class="ep-photo">${inisial}</div>
+                    <div class="ep-info">
+                      <h2 class="ep-name text-truncate" style="max-width: 220px;" title="${profil.nama}">${profil.nama}</h2>
+                      <div class="ep-role">Siswa</div>
+                      <div class="ep-details">NISN: ${nisnAman} &bull; NIPD: ${nipdAman}<br><small>${profil.tempatLahir || "-"}, ${tglLahirAman}</small></div>
+                    </div>
+                    <div class="ep-qr-wrap">
+                      <img src="${qrUrl}" class="ep-qr" alt="QR Code">
+                    </div>
+                  </div>
+                </div>`;
+            });
+            wadah.innerHTML = html;
+        } else wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">${res.pesan}</div>`;
+    });
+}
+
+function kirimDataKehadiran(identitas) {
     if(!identitas || identitas.trim() === "") return;
     
-    // Pecah data dari QR Code (Format: NISN|NAMA|KELAS)
+    // Memecah format QR (NISN|Nama|NIPD)
     let parts = identitas.split("|");
     let nisn = parts[0] || "-";
-    let nama = parts[1] || identitas; // Jaga-jaga jika QR format lama terpindai
-    let kelas = parts[2] || "-";
+    let nama = parts[1] || identitas; 
+    let nipdAtauKelas = parts[2] || "-"; 
     
     let tanggal = new Date().toLocaleDateString('id-ID'); // Kolom A
     let waktu = new Date().toLocaleTimeString('id-ID');   // Kolom B
     let petugas = dataUserGlobal.user.nama;               // Kolom I
     
-    // ARRAY PAYLOAD (Diurutkan sesuai index Kolom A - I)
-    // A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7, I=8
+    // SUSUNAN ARRAY WAJIB 9 ELEMEN (Sesuai Kolom A sampai I)
     let payloadData = [
         tanggal,        // A: Tanggal
         waktu,          // B: Waktu_Tiba
         nama,           // C: Nama_Siswa
         nisn,           // D: NISN
-        kelas,          // E: Kelas
+        nipdAtauKelas,  // E: Kelas / NIPD
         "Hadir",        // F: Status_Kehadiran
-        "",             // G: (Kosong)
-        "",             // H: (Kosong)
+        "",             // G: (Dikosongkan sesuai urutan)
+        "",             // H: (Dikosongkan sesuai urutan)
         petugas         // I: Petugas_Piket
     ];
 
@@ -1883,6 +1936,7 @@
         else { SwalMin.fire('Gagal', res.pesan, 'error'); }
     });
 }
+    
     function bukaModalManualAbsen() {
         Swal.fire({ title: 'Input Kehadiran Manual', input: 'text', inputPlaceholder: 'Ketik Nama atau NISN...', showCancelButton: true, confirmButtonText: 'Hadirkan', confirmButtonColor: '#198754' }).then((result) => { if (result.isConfirmed && result.value) { kirimDataKehadiran(result.value); } });
     }
@@ -1905,21 +1959,32 @@
 
 function loadECardData() {
     const wadah = document.getElementById('wadahDaftarECard');
-    wadah.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted small">Mencetak kartu identitas...</p></div>`;
+    wadah.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted small">Mencari data siswa...</p></div>`;
     
-    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: 'get_ecard', tenantDbId: dataUserGlobal.tenant.idDatabase, email: dataUserGlobal.user.email, role: dataUserGlobal.user.role.toLowerCase() }) })
+    // Deteksi jika yang login adalah orang tua, arahkan ke action baru
+    let roleUser = dataUserGlobal.user.role.toLowerCase();
+    let isOrtu = (roleUser.includes('ortu') || roleUser.includes('orang tua') || roleUser === 'user');
+    let targetAction = isOrtu ? 'get_ecard_ortu' : 'get_ecard';
+
+    fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify({ action: targetAction, tenantDbId: dataUserGlobal.tenant.idDatabase, email: dataUserGlobal.user.email, role: roleUser }) 
+    })
     .then(r => r.json()).then(res => {
         if(res.status === 'success') {
-            if(res.data.length === 0) return wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">Data tidak ditemukan.</div>`;
+            if(res.data.length === 0) return wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">Data anak belum tertaut dengan email Anda di DB_Student.</div>`;
+            
             let html = "";
             res.data.forEach(profil => {
-                let nisnAman = profil.nisn !== "-" ? profil.nisn : "-";
-                let kelasAman = profil.rombel && profil.rombel !== "-" ? profil.rombel : profil.role;
+                let nisnAman = profil.nisn || "-";
+                let nipdAman = profil.nipd || "-";
+                // Merapikan format tanggal jika ada (opsional)
+                let tglLahirAman = profil.tglLahir ? new Date(profil.tglLahir).toLocaleDateString('id-ID') : "-";
                 
-                // FORMAT QR BARU: NISN|Nama|Kelas
-                let qrTeks = `${nisnAman}|${profil.nama}|${kelasAman}`;
+                // FORMAT QR: NISN|Nama|NIPD
+                let qrTeks = `${nisnAman}|${profil.nama}|${nipdAman}`;
                 let qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrTeks)}&size=300&margin=1`;
-                let inisial = profil.nama.charAt(0).toUpperCase();
+                let inisial = profil.nama ? profil.nama.charAt(0).toUpperCase() : "U";
                 
                 html += `
                 <div class="ecard-container">
@@ -1930,9 +1995,9 @@ function loadECardData() {
                     </div>
                     <div class="ep-photo">${inisial}</div>
                     <div class="ep-info">
-                      <h2 class="ep-name text-truncate" style="max-width: 220px;">${profil.nama}</h2>
-                      <div class="ep-role">${nisnAman !== "-" ? "Siswa" : profil.role}</div>
-                      <div class="ep-details">NISN: ${nisnAman} <br> ${kelasAman}</div>
+                      <h2 class="ep-name text-truncate" style="max-width: 220px;" title="${profil.nama}">${profil.nama}</h2>
+                      <div class="ep-role">Siswa</div>
+                      <div class="ep-details">NISN: ${nisnAman} &bull; NIPD: ${nipdAman}<br><small>${profil.tempatLahir || "-"}, ${tglLahirAman}</small></div>
                     </div>
                     <div class="ep-qr-wrap">
                       <img src="${qrUrl}" class="ep-qr" alt="QR Code">
@@ -1942,6 +2007,50 @@ function loadECardData() {
             });
             wadah.innerHTML = html;
         } else wadah.innerHTML = `<div class="alert alert-danger text-center rounded-4 shadow-sm">${res.pesan}</div>`;
+    });
+}
+
+function kirimDataKehadiran(identitas) {
+    if(!identitas || identitas.trim() === "") return;
+    
+    // Memecah format QR (NISN|Nama|NIPD)
+    let parts = identitas.split("|");
+    let nisn = parts[0] || "-";
+    let nama = parts[1] || identitas; 
+    let nipdAtauKelas = parts[2] || "-"; 
+    
+    let tanggal = new Date().toLocaleDateString('id-ID'); // Kolom A
+    let waktu = new Date().toLocaleTimeString('id-ID');   // Kolom B
+    let petugas = dataUserGlobal.user.nama;               // Kolom I
+    
+    // SUSUNAN ARRAY WAJIB 9 ELEMEN (Sesuai Kolom A sampai I)
+    let payloadData = [
+        tanggal,        // A: Tanggal
+        waktu,          // B: Waktu_Tiba
+        nama,           // C: Nama_Siswa
+        nisn,           // D: NISN
+        nipdAtauKelas,  // E: Kelas / NIPD
+        "Hadir",        // F: Status_Kehadiran
+        "",             // G: (Dikosongkan sesuai urutan)
+        "",             // H: (Dikosongkan sesuai urutan)
+        petugas         // I: Petugas_Piket
+    ];
+
+    SwalMin.fire({title: 'Merekam...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+    
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ 
+            action: "simpan_keterlambatan", 
+            tenantDbAbsensiId: dataUserGlobal.tenant.idDbAbsensi, 
+            dataScan: payloadData 
+        })
+    }).then(r => r.json()).then(res => {
+        if(res.status === 'success') { 
+            Swal.fire({icon: 'success', title: 'Hadir!', text: nama, timer: 2000, showConfirmButton: false}); 
+            fokusScannerUSB(); 
+        } 
+        else { SwalMin.fire('Gagal', res.pesan, 'error'); }
     });
 }
 
