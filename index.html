@@ -1815,30 +1815,43 @@
         setTimeout(mulaiLiveScanner, 3000); 
     }
 
-      // Fungsi Pembuat Template HTML Per Kartu
+// Fungsi Pembuat Template HTML Per Kartu (Versi Modern)
 function buatTemplateKartu(data) {
-  // Buat QR Code dinamis berbasis Nama & NISN
-  let qrText = encodeURIComponent(data.nama + " | " + data.role);
-  let qrUrl = "https://quickchart.io/qr?text=" + qrText + "&size=100";
+  // QR Code tanpa margin putih berlebih
+  let qrText = encodeURIComponent(data.nama + " | " + data.nisn);
+  let qrUrl = "https://quickchart.io/qr?text=" + qrText + "&size=100&margin=0";
+  
+  // Ambil huruf pertama nama untuk avatar jika belum ada foto
+  let initial = data.nama ? data.nama.charAt(0).toUpperCase() : "U";
   
   return `
-    <div class="ektp-card">
-      <div class="ektp-header">
-        YAYASAN PENDIDIKAN KRISTO REGI
-        <span>NUSA CENDANA INTERNATIONAL PLUS SCHOOL</span>
+    <div class="ecard-modern">
+      <div class="ecard-watermark">YPKR</div>
+      
+      <div class="ecard-header">
+        <div class="brand">YPKR</div>
+        <div class="unit">NCIPS KUPANG</div>
       </div>
-      <div class="ektp-body">
-        <div class="ektp-photo">FOTO</div>
-        <div class="ektp-details">
-          <table>
-            <tr><td>Nama</td><td>:</td><td><b>${data.nama}</b></td></tr>
-            <tr><td>NISN/NIP</td><td>:</td><td>${data.nisn}</td></tr>
-            <tr><td>Rombel</td><td>:</td><td>${data.rombel}</td></tr>
-          </table>
+      
+      <div class="ecard-body">
+        <div class="ecard-photo">
+          <span style="font-size:24px; font-weight:900; color:#cbd5e1;">${initial}</span>
+        </div>
+        
+        <div class="ecard-info">
+          <h2 class="ecard-name">${data.nama}</h2>
+          <div class="ecard-role-badge">${data.role}</div>
+          
+          <div class="ecard-detail-row">
+            <span>ID/NISN</span> <span>: ${data.nisn}</span>
+          </div>
+          <div class="ecard-detail-row">
+            <span>Rombel</span> <span>: ${data.rombel}</span>
+          </div>
         </div>
       </div>
-      <div class="ektp-footer-role">${data.role}</div>
-      <img src="${qrUrl}" class="ektp-qr" alt="QR">
+      
+      <img src="${qrUrl}" class="ecard-qr" alt="QR Code">
     </div>
   `;
 }
