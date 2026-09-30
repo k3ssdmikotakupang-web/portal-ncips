@@ -260,6 +260,145 @@
     margin: 5px;
   }
 }
+
+
+    /* WADAH RESPONSIVE UNTUK TAMPILAN DI HP */
+.ecard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 5px;
+  width: 100%;
+}
+
+/* DESAIN E-CARD PREMIUM - AZURE & GOLD THEME */
+.ecard-premium {
+  width: 325px; /* Sempurna & ramah untuk layar HP standar (360px) */
+  height: 205px; /* Proporsi standar ID Card */
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 82, 212, 0.15); /* Soft shadow biru */
+  position: relative;
+  overflow: hidden;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Gelombang Biru (Azure) Elegan di Atas */
+.ecard-premium::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; left: 0;
+  height: 95px;
+  background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+  border-bottom-left-radius: 35px;
+  border-bottom-right-radius: 5px;
+  z-index: 1;
+}
+
+/* Aksen Garis Emas (Gold) di bawah gelombang biru */
+.ecard-premium::after {
+  content: "";
+  position: absolute;
+  top: 90px; right: 25px;
+  width: 120px; height: 4px;
+  background: linear-gradient(90deg, #F3A183 0%, #F6D365 100%);
+  border-radius: 5px;
+  z-index: 2;
+}
+
+/* Header Organisasi */
+.ep-header {
+  position: relative;
+  z-index: 3;
+  color: #ffffff;
+  text-align: right;
+  padding: 15px 25px 0 0;
+}
+.ep-header h3 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 1.5px; }
+.ep-header p { margin: 0; font-size: 8px; font-weight: 600; opacity: 0.95; letter-spacing: 0.5px; }
+
+/* Area Konten Data */
+.ep-body {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  padding: 5px 20px;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+/* Tempat Foto Kekinian (Kotak Membulat, bukan sekadar lingkaran) */
+.ep-photo {
+  width: 75px; height: 75px;
+  background: #f8f9fa;
+  border-radius: 14px; 
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  display: flex; justify-content: center; align-items: center;
+  font-size: 32px; font-weight: 900; color: #4364F7;
+  margin-top: -15px; /* Overlap menyentuh area biru */
+  z-index: 4;
+  flex-shrink: 0;
+}
+
+/* Tipografi Informasi */
+.ep-info {
+  padding-top: 15px;
+}
+.ep-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.ep-role {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 9px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  border: 1px solid #bfdbfe;
+}
+.ep-details { font-size: 9px; color: #64748b; line-height: 1.5; }
+.ep-details .row { display: flex; }
+.ep-details span.label { font-weight: 700; color: #475569; width: 55px; }
+
+/* QR Code Kanan Bawah */
+.ep-qr {
+  position: absolute;
+  bottom: 12px; right: 20px;
+  width: 50px; height: 50px;
+  background: white; padding: 2px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+  z-index: 3;
+}
+
+/* MODE CETAK (PRINT) - Otomatis konversi piksel ke milimeter standar KTP */
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area {
+    position: absolute; left: 0; top: 0; width: 100%;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  }
+  .ecard-container { padding: 0; width: auto; }
+  .ecard-premium {
+    width: 85.6mm; height: 53.98mm;
+    box-shadow: none;
+    border: 1px dashed #ccc; /* Garis bantu potong saat diprint */
+    margin: 2px;
+  }
+}
+    
   </style>
 </head>
 <body>
